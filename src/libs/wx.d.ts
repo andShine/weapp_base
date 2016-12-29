@@ -1,26 +1,26 @@
 /**
  * wx模块api
- * 使用{@link .libs/webApp.d.ts}
+ * 使用{@link .typings/index.d.ts}
  */
 declare module "wx" {
-
-    import { AppUserInfo } from "data";
-
+    import {
+        AppUserInfo
+    } from "data";
     export interface App {
         globalData: {
             userInfo: UserInfo,
             appUserInfo: AppUserInfo,
+            resultParams: any
         };
         getUserInfo(cb: (userInfo: UserInfo) => void);
+        getProfile(cb: (result) => void, useCache?: boolean);
     }
-
     export interface NavigateObj {
         url: string;
         success?: () => {};
         fail?: () => {};
         complete?: () => {};
     }
-
     export interface StorageObj {
         key: string;
         data?: any;
@@ -28,13 +28,10 @@ declare module "wx" {
         fail?: () => {};
         complete?: () => {};
     }
-
     export interface LoginType {
         errMsg?: string,
         code?: string
     }
-
-
     export interface UserInfoType {
         /**
          * 用户信息对象，不包含 openid 等敏感信息
@@ -53,13 +50,11 @@ declare module "wx" {
          */
         encryptData: string
     }
-
     export interface Callback<T> {
         success?: (obj?: T) => {};
         fail?: () => {};
         complete?: () => {};
     }
-
     export interface PaymentObj {
         /**
          * 时间戳从1970年1月1日00:00:00至今的秒数,即当前的时间
@@ -85,7 +80,6 @@ declare module "wx" {
         fail: () => {},
         complete: () => {}
     }
-
     /**
      * 微信自己的用户信息
      */
@@ -99,18 +93,15 @@ declare module "wx" {
         nickName: string,
         province: string
     }
-
     export interface EventTarget {
         dataset: Object;
         id: string;
         offsetLeft: number;
         offsetTop: number;
     }
-
     export interface EventDetail {
         value: any;
     }
-
     export interface Event {
         currentTarget: EventTarget;
         target: EventTarget;
@@ -119,4 +110,3 @@ declare module "wx" {
         type: string;
     }
 }
-

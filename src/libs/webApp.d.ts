@@ -19,6 +19,12 @@ declare interface IApp {
 	 * 生命周期函数--监听小程序隐藏。当小程序从前台进入后台，会触发 onHide
 	 */
 	onHide?: () => void;
+
+	getUserInfo: (cb: (result) => {}) => void;
+
+	getProfile: (cb: (result) => void, useCache?: boolean) => void
+
+	globalData: any;
 }
 
 /**
@@ -44,7 +50,7 @@ declare interface IPage {
 	/**
 	 * 生命周期函数--监听页面加载
 	 */
-	onLoad?: () => void;
+	onLoad?: (opts?: any) => void;
 
 	/**
 	 * 生命周期函数--监听页面初次渲染完成
@@ -90,6 +96,16 @@ declare interface IPage {
 	 * 更新
 	 */
 	update?: () => void;
+
+	/**
+	 * 设置该页面的分享信息
+	 * @type {[type]}
+	 */
+	onShareAppMessage?: () => {
+		title: string,
+		desc?: string,
+		path: string
+	};
 }
 
 /**
@@ -1157,12 +1173,14 @@ declare namespace wx {
 	 */
 	export function onCompassChange(callback: (res?: CompassChangeResponse) => void): void;
 
-	export interface MakePhoneCallOptions {
+	export interface MakePhoneCallOptions extends BaseOptions {
 
 		/**
 		 * 需要拨打的电话号码
 		 */
-		phoneNumber: number;
+		phoneNumber: string;
+
+
 	}
 
 	/**
@@ -1337,10 +1355,24 @@ declare namespace wx {
 		url: string;
 	}
 
+	export interface SwitchTabOptions extends BaseOptions {
+
+		/**
+		 * 需要跳转的 tabBar 页面的路径（需在 app.json 的 tabBar 字段定义的页面），路径后不能带参数
+		 */
+		url: string;
+	}
+
 	/**
 	 * 关闭当前页面，跳转到应用内的某个页面。
 	 */
 	export function redirectTo(options: RedirectToOptions): void;
+
+	/**
+	 * 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面
+	 * 
+	 */
+	export function switchTab(options: SwitchTabOptions): void;
 
 	export interface NavigateBackOptions {
 
@@ -1669,10 +1701,11 @@ declare namespace wx {
 		 * @param x 矩形路径左上角的x坐标
 		 * @param y 矩形路径左上角的y坐标
 		 * @param radius 矩形路径的宽度
-		 * @param startAngle 起始弧度
-		 * @param sweepAngle 从起始弧度开始，扫过的弧度
+		 * @param sAngle 起始弧度
+		 * @param eAngle 终止弧度
+		 * @param counterclockwise 指定弧度的方向是逆时针还是顺时针。默认是false，即顺时针
 		 */
-		arc(x: number, y: number, radius: number, startAngle: number, sweepAngle: number): void;
+		arc(x: number, y: number, radius: number, sAngle: number, eAngle: number, counterclockwise?: boolean): void;
 
 		/**
 		 * 创建二次贝塞尔曲线路径。
@@ -1751,12 +1784,43 @@ declare namespace wx {
 		 * @param miterLimit 最大斜接长度
 		 */
 		setMiterLimit(miterLimit: number): void;
+
+		/**
+		 * 填充一个矩形
+		 * @param x 矩形路径左上角的x坐标
+		 * @param y 矩形路径左上角的y坐标
+		 * @param width 矩形路径的宽度
+		 * @param height 矩形路径的高度
+		 */
+		fillRect(x: number, y: number, width: number, height: number): void;
+
+		/**
+		 * 画一个矩形(非填充)
+		 * @param x 矩形路径左上角的x坐标
+		 * @param y 矩形路径左上角的y坐标
+		 * @param width 矩形路径的宽度
+		 * @param height 矩形路径的高度
+		 */
+		strokeRect(x: number, y: number, width: number, height: number): void;
+
+		/**
+		 * 将之前在绘图上下文中的描述（路径、变形、样式）画到 canvas 中。
+		 * @param reserve 非必填。本次绘制是否接着上一次绘制，即reserve参数为false，则在本次调用drawCanvas绘制之前native层应先清空画布再继续绘制；
+		 * 若reserver参数为true，则保留当前画布上的内容，本次调用drawCanvas绘制的内容覆盖在上面，默认 false
+		 */
+		draw(reserve?: boolean): void;
 	}
 
 	/**
 	 * 创建并返回绘图上下文context对象。
 	 */
 	export function createContext(): CanvasContext;
+
+	/**
+	 * 创建 canvas 绘图上下文（指定 canvasId）
+	 * 需要指定 canvasId，该绘图上下文只作用于对应的 <canvas/
+	 */
+	export function createCanvasContext(canvasId: string): CanvasContext;
 
 	export interface DrawCanvasOptions {
 
